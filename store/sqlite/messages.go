@@ -2,7 +2,6 @@ package sqlite
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"hello-golang-api/entities"
 	"strconv"
@@ -14,31 +13,22 @@ import (
 
 func (c *Client) MessageGetByID(ctx context.Context, id string) (*entities.Message, error) {
 	msg := new(entities.Message)
-	rows, err := c.db.Query(`SELECT id, text, date FROM messages WHERE id=?`, id)
-	if err == sql.ErrNoRows {
-		return nil, fmt.Errorf("no record found for %q", id)
-	} else if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		err = rows.Scan(msg.Id, msg.Text, msg.Date)
-		if err != nil {
-			return nil, err
-		}
-		return msg, nil
-	}
+	row := c.db.QueryRow(`SELECT id, text, date FROM messages WHERE id=?`, id)
 
-	return nil, fmt.Errorf("no record found for %q", id)
+	err := row.Scan(&msg.Id, &msg.Text, &msg.Date)
+	if err != nil {
+		return nil, fmt.Errorf("no record found for %q", id)
+	}
+	return msg, nil
 }
 
-func (c *Client) MessageSave(ctx context.Context, user *entities.Message) error {
+func (c *Client) MessageSave(ctx context.Context, msg *entities.Message) error {
 	stmt, err := c.db.Prepare("insert into messages(id,text,date) values(?,?,?)")
 	if err != nil {
 		return err
 	}
 
-	res, err := stmt.Exec(user.Id, user.Text, user.Date)
+	res, err := stmt.Exec(msg.Id, msg.Text, msg.Date)
 	if err != nil {
 		return err
 	}
@@ -115,7 +105,7 @@ func (c *Client) MessagesList(ctx context.Context, qp *queryp.QueryParameters) (
 		return nil, 0, err
 	}
 	var count int64
-	if row := c.db.QueryRow(`SELECT COUNT(*) AS count FROM users `+queryClause.String(), queryParams...); row != nil {
+	if row := c.db.QueryRow(`SELECT COUNT(*) AS count FROM messages `+queryClause.String(), queryParams...); row != nil {
 		err := row.Scan(&count)
 		if err != nil {
 			return nil, 0, err
@@ -140,7 +130,7 @@ func (c *Client) MessagesList(ctx context.Context, qp *queryp.QueryParameters) (
 
 	for rows.Next() {
 		msg := &entities.Message{}
-		err = rows.Scan(msg.Id, msg.Text, msg.Date)
+		err = rows.Scan(&msg.Id, &msg.Text, &msg.Date)
 		if err != nil {
 			return nil, 0, err
 		}

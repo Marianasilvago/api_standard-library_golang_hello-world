@@ -17,7 +17,7 @@ func (s *Server) validateToken(next http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		token, err := extractToken(req, s.authConfig.Audience, s.tenantKeys)
 		if err != nil {
-			fmt.Printf("failed to parshasPermissione payload: %s\n", err)
+			s.logger.Errorf("failed to parshasPermissione payload: %s\n", err)
 			rw.WriteHeader(http.StatusUnauthorized)
 			sendMessage(rw, &message{err.Error()})
 			return

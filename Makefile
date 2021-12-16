@@ -15,17 +15,19 @@ ${GOPATH}/bin/swag:
 
 .PHONY: swagger
 swagger: tools ${SWAGGERSOURCE}
+	#rm embed/swagger/api_docs/docs.go
 	swag init --dir . --generalInfo server/swagger.go --exclude embed --output embed/swagger/api_docs
-	rm embed/swagger/api_docs/docs.go
+	
 	
 embed/swagger/api_docs/swagger.json: tools ${SWAGGERSOURCE}
+	#rm embed/swagger/api_docs/docs.go
 	swag init --dir . --generalInfo server/swagger.go --exclude embed --output embed/swagger/api_docs
-	rm embed/swagger/api_docs/docs.go
+
 
 .PHONY: ${EXECUTABLE}
 ${EXECUTABLE}: tools embed/swagger/api_docs/swagger.json
 	# Compiling...
-	go build -ldflags "-X ${PACKAGENAME}/conf.Executable=${EXECUTABLE} -X ${PACKAGENAME}/conf.GitVersion=${GITVERSION}" -o ${EXECUTABLE}
+	go build -ldflags "-X ${PACKAGENAME}/common.Executable=${EXECUTABLE} -X ${PACKAGENAME}/common.GitVersion=${GITVERSION}" -o ${EXECUTABLE}
 
 .PHONY: test
 test:

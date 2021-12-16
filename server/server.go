@@ -45,6 +45,9 @@ func publicApiHandler(rw http.ResponseWriter, _ *http.Request) {
 }
 
 func pingHandler(rw http.ResponseWriter, _ *http.Request) {
+	rw.Header().Add("Content-Type", "text/plain; charset=UTF-8")
+	rw.Header().Add("X-Frame-Options", "deny")
+	rw.Header().Add("X-Content-Type-Options", "nosniff")
 	_, err := rw.Write([]byte("pong"))
 	if err != nil {
 		log.Print("http response write error", err)

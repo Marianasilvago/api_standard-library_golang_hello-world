@@ -12,12 +12,14 @@ var (
 	GitVersion = "NoGitVersion"
 )
 
+type Version struct {
+	Version string `json:"version"`
+}
+
 // GetVersion returns version as a simple json
 func GetVersion() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		v := struct {
-			Version string `json:"version"`
-		}{
+		v := &Version{
 			Version: GitVersion,
 		}
 		w.Header().Set("Content-Type", "application/json")

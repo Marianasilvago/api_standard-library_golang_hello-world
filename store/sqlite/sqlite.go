@@ -17,10 +17,10 @@ type Client struct {
 	db     *sql.DB
 }
 
-func New(settings map[string]string) (*Client, error) {
+func New(settings map[string]string, subpath string) (*Client, error) {
 	logger := zap.S().With("package", "store.sqlite")
 
-	dbPath := path.Join("store", "sqlite", "db", settings["database.file"])
+	dbPath := path.Join(subpath, "db", settings["database.file"])
 	if settings["database.auto_create"] == "true" {
 
 		if _, err := os.Stat(dbPath); err == nil {

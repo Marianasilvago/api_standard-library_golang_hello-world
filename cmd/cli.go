@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	_ "net/http/pprof" // Import for pprof
+	"path"
 
 	"go.uber.org/zap"
 )
@@ -21,7 +22,7 @@ func Execute(settings map[string]string, environment []byte) {
 	}
 
 	// Database
-	dbstore, err := sqlite.New(settings)
+	dbstore, err := sqlite.New(settings, path.Join("store", "sqlite"))
 	if err != nil {
 		logger.Fatalw("Database error", "error", err)
 	}
